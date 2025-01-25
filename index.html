@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Form Builder</title>
+    <style>
+        .form-field {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dynamic Form Builder</h1>
+    <div id="formContainer">
+        <form id="dynamicForm">
+            <!-- Dynamic fields will be added here -->
+        </form>
+        <button onclick="addField()">Add Field</button>
+        <button onclick="submitForm()">Submit Form</button>
+    </div>
+
+    <script>
+        let fieldCount = 0;
+
+        function addField() {
+            fieldCount++;
+            const form = document.getElementById('dynamicForm');
+            const newField = document.createElement('div');
+            newField.classList.add('form-field');
+            newField.innerHTML = `
+                <label for="field${fieldCount}">Field ${fieldCount}</label>
+                <input type="text" id="field${fieldCount}" name="field${fieldCount}" required>
+                <button type="button" onclick="removeField(this)">Remove</button>
+            `;
+            form.appendChild(newField);
+        }
+
+        function removeField(button) {
+            const field = button.parentElement;
+            field.remove();
+        }
+
+        function submitForm() {
+            const form = document.getElementById('dynamicForm');
+            const formData = new FormData(form);
+            const formJSON = JSON.stringify(Object.fromEntries(formData.entries()));
+            
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: formJSON
+            }).then(response => response.json())
+              .then(data => console.log(data))
+              .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
